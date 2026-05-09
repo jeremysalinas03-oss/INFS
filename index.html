@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triple-Extortion Ransomware</title>
+
+  <style>
+    /* =============================
+       GLOBAL RESET AND BASE STYLES
+    ============================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #02060a;
+      color: #f2f7ff;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Matrix rain canvas behind the entire website */
+    #matrixRain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: #02060a;
+    }
+
+    /* Dark overlay to make text easier to read */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: -1;
+    }
+
+    /* =============================
+       NAVIGATION BAR
+    ============================== */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(2, 8, 14, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0, 255, 170, 0.35);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      font-weight: bold;
+      color: #00ffae;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      color: #d8f8ff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #00ffae;
+      text-shadow: 0 0 12px #00ffae;
+    }
+
+    /* =============================
+       HERO SECTION
+    ============================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 80px;
+      text-align: center;
+      background: radial-gradient(circle at center, rgba(0, 255, 174, 0.18), rgba(1, 8, 15, 0.88) 60%);
+    }
+
+    .hero-content {
+      max-width: 950px;
+      animation: slideUp 1.2s ease forwards;
+    }
+
+    .tagline {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 8px 16px;
+      border: 1px solid rgba(0, 255, 174, 0.5);
+      border-radius: 999px;
+      color: #00ffae;
+      background: rgba(0, 255, 174, 0.08);
+      font-size: 0.9rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 5.2rem);
+      line-height: 1.05;
+      margin-bottom: 22px;
+      text-shadow: 0 0 25px rgba(0, 255, 174, 0.45);
+    }
+
+    .hero p {
+      max-width: 820px;
+      margin: 0 auto 32px;
+      font-size: 1.12rem;
+      color: #d5e8ef;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 22px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .btn-primary {
+      color: #00110c;
+      background: #00ffae;
+      box-shadow: 0 0 18px rgba(0, 255, 174, 0.45);
+    }
+
+    .btn-secondary {
+      color: #00ffae;
+      border: 1px solid #00ffae;
+      background: rgba(0, 255, 174, 0.06);
+    }
+
+    .btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 25px rgba(0, 255, 174, 0.75);
+    }
+
+    /* =============================
+       SECTIONS
+    ============================== */
+    section.content-section {
+      min-height: 100vh;
+      padding: 105px 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-inner {
+      max-width: 1150px;
+      margin: auto;
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      color: #00ffae;
+      margin-bottom: 18px;
+      text-shadow: 0 0 18px rgba(0, 255, 174, 0.45);
+    }
+
+    .section-subtitle {
+      color: #b6d7df;
+      max-width: 850px;
+      margin-bottom: 36px;
+      font-size: 1.05rem;
+    }
+
+    /* Different backgrounds for each report section */
+    #abstract {
+      background: linear-gradient(135deg, rgba(0, 255, 174, 0.13), rgba(8, 16, 32, 0.9));
+    }
+
+    #introduction {
+      background: linear-gradient(135deg, rgba(0, 96, 255, 0.18), rgba(2, 9, 18, 0.92));
+    }
+
+    #information {
+      background: linear-gradient(135deg, rgba(113, 0, 255, 0.18), rgba(2, 9, 18, 0.92));
+    }
+
+    #analysis {
+      background: linear-gradient(135deg, rgba(255, 136, 0, 0.16), rgba(2, 9, 18, 0.94));
+    }
+
+    #solutions {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.16), rgba(2, 9, 18, 0.94));
+    }
+
+    #conclusion {
+      background: linear-gradient(135deg, rgba(0, 255, 110, 0.16), rgba(2, 9, 18, 0.96));
+    }
+
+    /* =============================
+       CARDS AND LAYOUTS
+    ============================== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background: rgba(5, 18, 28, 0.78);
+      border: 1px solid rgba(0, 255, 174, 0.24);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      transition: 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.01);
+      border-color: rgba(0, 255, 174, 0.7);
+      box-shadow: 0 0 28px rgba(0, 255, 174, 0.22);
+    }
+
+    .card .icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      color: #ffffff;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    .card p,
+    .card li {
+      color: #cfe5ed;
+      font-size: 0.96rem;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      margin-top: 8px;
+    }
+
+    .wide-card {
+      margin-top: 28px;
+      background: rgba(5, 18, 28, 0.8);
+      border-left: 5px solid #00ffae;
+      border-radius: 16px;
+      padding: 26px;
+      color: #dceff5;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .timeline-item {
+      background: rgba(5, 18, 28, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 18px;
+      align-items: start;
+      transition: 0.3s ease;
+    }
+
+    .timeline-item:hover {
+      border-color: rgba(0, 255, 174, 0.6);
+      transform: translateX(6px);
+    }
+
+    .step-number {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #00ffae;
+      color: #00110c;
+      font-weight: bold;
+      box-shadow: 0 0 16px rgba(0, 255, 174, 0.6);
+    }
+
+    /* Fade-in animation triggered by JavaScript */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(45px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(45px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =============================
+       RESPONSIVE DESIGN
+    ============================== */
+    @media (max-width: 900px) {
+      .nav-container {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+        gap: 12px;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      section.content-section {
+        padding: 100px 18px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+    }
+	/* =========================
+   FOOTER
+========================= */
+
+.site-footer {
+    background: linear-gradient(to top, #000000, #021b12);
+    border-top: 2px solid #00ff99;
+    padding: 50px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-content {
+    position: relative;
+    z-index: 2;
+}
+
+.site-footer h3 {
+    color: #00ff99;
+    font-size: 2rem;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px #00ff99;
+}
+
+.site-footer p {
+    color: #d9d9d9;
+    font-size: 1.1rem;
+    margin: 10px 0;
+    letter-spacing: 1px;
+}
+
+/* glowing animated line */
+
+.site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 2px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #00ff99,
+        transparent
+    );
+
+    animation: footerGlow 4s linear infinite;
+}
+
+@keyframes footerGlow {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(50%);
+    }
+}
+  </style>
+</head>
+
+<body>
+  <!-- Animated Matrix rain background -->
+  <canvas id="matrixRain"></canvas>
+  <div class="overlay"></div>
+
+  <!-- Fixed navigation bar -->
+  <nav>
+    <div class="nav-container">
+      <div class="logo">TRIPLE-EXTORTION RANSOMWARE</div>
+      <ul class="nav-links">
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#information">Information</a></li>
+        <li><a href="#analysis">Analysis</a></li>
+        <li><a href="#solutions">Solutions</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero / title area -->
+  <header class="hero"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.80)),
+url('images/hero-shield.png');
+background-size: contain;
+background-position: center center;
+background-repeat: no-repeat;
+">
+    <div class="hero-content">
+      <span class="tagline">INFS 4391 • Information Security • Spring 2026</span>
+      <h1>Triple-Extortion Ransomware</h1>
+      <p>
+        A modern cybersecurity threat that combines encryption, data theft, and third-party pressure to force organizations into paying ransom demands.
+      </p>
+      <div class="hero-buttons">
+        <a class="btn btn-primary" href="#abstract">Explore Report</a>
+        <a class="btn btn-secondary" href="#solutions">View Defenses</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Abstract section -->
+  <section id="abstract"
+class="content-section fade-in"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.82)),
+url('images/ab.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+">
+    <div class="section-inner">
+      <h2 class="section-title">Abstract</h2>
+      <p class="section-subtitle">
+        Triple-extortion ransomware is an evolution of traditional ransomware. Instead of only encrypting files, attackers steal data and apply additional pressure to victims, customers, employees, vendors, or other connected groups.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="icon">🔒</div>
+          <h3>Encryption</h3>
+          <p>Attackers lock files or systems to disrupt business operations and prevent normal access.</p>
+        </div>
+        <div class="card">
+          <div class="icon">📤</div>
+          <h3>Data Theft</h3>
+          <p>Sensitive records may be stolen before encryption and used as leverage against the organization.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⚠️</div>
+          <h3>Third-Party Pressure</h3>
+          <p>Attackers may contact customers, patients, employees, or vendors to increase fear and pressure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction section -->
+  <section id="introduction"
+class="content-section fade-in"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.60), rgba(0,0,0,0.72)),
+url('images/1.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+">
+    <div class="section-inner">
+      <h2 class="section-title">Introduction</h2>
+      <p class="section-subtitle">
+        Ransomware has become one of the most serious threats in information security because it directly attacks confidentiality, integrity, and availability. Triple extortion makes the problem worse by turning ransomware into a technical, legal, financial, and ethical crisis.
+      </p>
+
+      <div class="wide-card">
+        <p>
+          Traditional ransomware mainly focused on locking files and demanding payment. Modern ransomware groups now steal data before encryption and threaten to expose it. Triple-extortion ransomware adds another layer by pressuring people or organizations connected to the victim. This means backups alone are not enough. Organizations must protect systems, data, people, and trust.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Information section -->
+  <section id="information"
+class="content-section fade-in"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.72)),
+url('images/2.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+">
+    <div class="section-inner">
+      <h2 class="section-title">Information</h2>
+      <p class="section-subtitle">
+        Triple-extortion ransomware usually follows a sequence of actions that begins with unauthorized access and ends with pressure-based extortion.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="step-number">1</div>
+          <div>
+            <h3>Initial Access</h3>
+            <p>Attackers may enter through phishing emails, stolen credentials, exposed remote access, unpatched systems, or third-party vendors.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="step-number">2</div>
+          <div>
+            <h3>Reconnaissance</h3>
+            <p>Once inside, attackers search for important systems, sensitive files, backups, privileged accounts, and security weaknesses.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="step-number">3</div>
+          <div>
+            <h3>Data Exfiltration</h3>
+            <p>Customer records, employee data, financial documents, health records, intellectual property, and internal emails may be stolen.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="step-number">4</div>
+          <div>
+            <h3>Encryption and Disruption</h3>
+            <p>Attackers encrypt files or disable systems to stop normal business operations and increase urgency.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="step-number">5</div>
+          <div>
+            <h3>Extortion Pressure</h3>
+            <p>The victim may face threats of public leaks, customer notification, regulatory consequences, DDoS attacks, or direct third-party intimidation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analysis section -->
+  <section id="analysis" 
+  class="content-section fade-in"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.60), rgba(0,0,0,0.72)),
+url('images/3.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+">
+    <div class="section-inner">
+      <h2 class="section-title">Analysis</h2>
+      <p class="section-subtitle">
+        Triple-extortion ransomware changes the risk model because the damage is not limited to encrypted files. It affects operations, privacy, trust, reputation, legal responsibility, and human well-being.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="icon">🏢</div>
+          <h3>Business Risk</h3>
+          <p>Ransomware can stop services, delay recovery, increase costs, and force leadership to make major decisions during a crisis.</p>
+        </div>
+        <div class="card">
+          <div class="icon">👥</div>
+          <h3>Human Impact</h3>
+          <p>Customers, students, patients, and employees may become victims when attackers threaten or expose personal data.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⚖️</div>
+          <h3>Legal and Ethical Issues</h3>
+          <p>Organizations may face breach notification rules, privacy obligations, regulatory risk, and reputational damage.</p>
+        </div>
+      </div>
+
+      <div class="wide-card">
+        <p>
+          The key lesson is that backups are necessary, but they are not sufficient. Backups can restore encrypted files, but they cannot undo data theft or stop attackers from threatening third parties. Modern ransomware defense must focus on resilience, not only recovery.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solutions section -->
+  <section id="solutions"
+class="content-section fade-in"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.50), rgba(0,0,0,0.72)),
+url('images/4.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+">
+    <div class="section-inner">
+      <h2 class="section-title">Solutions</h2>
+      <p class="section-subtitle">
+        Effective defense requires layered security controls that protect systems, data, users, and business operations before, during, and after an attack.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="icon">🔐</div>
+          <h3>Access Control</h3>
+          <ul>
+            <li>Require multi-factor authentication</li>
+            <li>Use least privilege access</li>
+            <li>Monitor privileged accounts</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="icon">🛡️</div>
+          <h3>Technical Defense</h3>
+          <ul>
+            <li>Use endpoint detection and response</li>
+            <li>Patch vulnerable systems quickly</li>
+            <li>Segment critical networks</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="icon">💾</div>
+          <h3>Backup Strategy</h3>
+          <ul>
+            <li>Follow the 3-2-1 backup rule</li>
+            <li>Use offline or immutable backups</li>
+            <li>Test restoration regularly</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="icon">📋</div>
+          <h3>Incident Response</h3>
+          <ul>
+            <li>Create a ransomware response plan</li>
+            <li>Run tabletop exercises</li>
+            <li>Prepare crisis communication steps</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="icon">🎓</div>
+          <h3>Employee Training</h3>
+          <ul>
+            <li>Teach phishing awareness</li>
+            <li>Encourage fast reporting</li>
+            <li>Create a blame-free security culture</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="icon">🤝</div>
+          <h3>Vendor Risk</h3>
+          <ul>
+            <li>Review third-party access</li>
+            <li>Require breach notification terms</li>
+            <li>Limit vendor permissions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conclusion section -->
+  <section id="conclusion"
+class="content-section fade-in"
+style="
+background-image:
+linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)),
+url('images/5.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+">
+    <div class="section-inner">
+      <h2 class="section-title">Conclusion</h2>
+      <p class="section-subtitle">
+        Triple-extortion ransomware is a serious cybersecurity threat because it targets systems, data, and people at the same time. It uses fear, disruption, and public pressure to force organizations into payment decisions.
+      </p>
+
+      <div class="wide-card">
+        <p>
+          The strongest defense is cyber resilience. Organizations must be able to prevent, detect, contain, respond, recover, and learn from ransomware incidents. This requires technical controls such as MFA, backups, EDR, encryption, patching, and network segmentation. It also requires management planning, employee training, vendor oversight, and clear policies. A prepared organization can reduce panic, protect stakeholders, and continue operating even during a ransomware crisis.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* =============================
+       MATRIX DIGITAL RAIN EFFECT
+    ============================== */
+    const canvas = document.getElementById("matrixRain");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const characters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&<>/{}[]";
+    const fontSize = 16;
+    let columns = Math.floor(canvas.width / fontSize);
+    let drops = Array(columns).fill(1);
+
+    function drawMatrixRain() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00ffae";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrixRain, 45);
+
+    /* Resize canvas when browser size changes */
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      columns = Math.floor(canvas.width / fontSize);
+      drops = Array(columns).fill(1);
+    });
+
+    /* =============================
+       SCROLL FADE-IN ANIMATION
+    ============================== */
+    const fadeElements = document.querySelectorAll(".fade-in");
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.18
+      }
+    );
+
+    fadeElements.forEach(element => observer.observe(element));
+  </script>
+  <footer class="site-footer">
+    <div class="footer-content">
+        <h3>Team 7</h3>
+
+        <p>
+            Jeremy Salinas • Ewuradwoa Nketiah • Christian Escobedo
+        </p>
+
+        <p>
+            INFS 4391 – Information Security
+        </p>
+
+        <p>
+            Spring 2026
+        </p>
+
+        <p>
+            May 10, 2026
+        </p>
+    </div>
+</footer>
+</body>
+</html>
